@@ -1,0 +1,170 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Key Display for OBS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+        <style>
+            .keyboard
+            {
+                float: none;
+            }
+            .key
+            {
+                border: solid black 2px;
+                border-radius: 3px;
+                padding: 10px 15px;
+                margin: 4px 4px;
+                float: left;
+                text-align: center;
+                /*width: 20px;*/
+                height: 20px;
+                min-width: 15px;
+                transform: skewX(-10deg) rotate(-.3deg)
+            }
+            .active
+            {
+                background: rgba(0,0,0,.5);
+            }
+            .standard
+            {
+                width: 20px;
+                height: 20px;
+            }
+            .row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                padding: 0px;
+                margin: 0px;
+            }
+            body{
+                font-family: 'Roboto', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="keyboard" class="keyboard">
+        </div>
+        <button onClick="sendMsg()">Hit Me</button>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+        <script>
+            const socket = io("http://localhost:8080");
+
+            socket.on('connect', () => {
+                socket.send('hi');
+
+                
+            });
+
+            socket.on("press", function(data) {
+                data = data.replace(/\'|\"/g,"")
+                //console.log("pressing",data);
+                
+                for(var key = 0;key < keys.length;key++)
+                {
+                    //console.log("in for loop")
+                    //console.log("checking if: ",data,"=",keys[key].innerHTML.toLowerCase())
+                    if(data.toLowerCase() == keys[key].innerHTML.toLowerCase())
+                    {
+                        keys[key].className = "key active"
+                        break
+                    }
+                }
+            });
+            socket.on("release", function(data) {
+                data = data.replace(/\'|\"/g,"")
+                //console.log("relseasing: ",data);
+                
+                for(var key = 0;key < keys.length;key++)
+                {
+                    //console.log("in for loop")
+                    //console.log("checking if: ",data,"=",keys[key].innerHTML.toLowerCase())
+                    if(data.toLowerCase() == keys[key].innerHTML.toLowerCase())
+                    {
+                        keys[key].className = "key"
+                        break
+                    }
+                }
+            });
+
+
+            function sendMsg() {
+                socket.emit("message", "HELLO WORLD");
+            }
+
+        </script>
+        <script>
+            class Modifier {
+                constructor(width, color, specialText) {
+                    this.width = width;
+                    this.color = color;
+                    this.specialText = specialText;
+                }
+            }
+            rows=[
+                ["`","1","2","3","4","5","6"],
+                ["TAB","Q","W","E","R","T","Y"],
+                ["CAPSLK","A","S","D","F","G","H"],
+                ["SHIFT","Z","X","C","V","B","N"]
+            ]
+            modifiers = 
+                {
+                "SHIFT":4
+            }
+            var keyboard = document.getElementById("keyboard");
+            console.log(keyboard);
+            for(var row = 0; row < rows.length;row++)
+            {
+                var currentRow = document.createElement("div");
+                currentRow.className = "row";
+                for(var key = 0; key < rows[row].length;key++)
+                {
+                    let currentKey = document.createElement("div");
+                    currentKey.className = "key";
+                    contents = rows[row][key]
+                    if (modifiers[contents])
+                    {
+                        contents = "&nbsp;".repeat(modifiers[contents])+contents+"&nbsp;".repeat(modifiers[contents])
+                    }
+                    currentKey.innerHTML = contents
+                    currentRow.appendChild(currentKey)
+                }
+                keyboard.appendChild(currentRow);
+            }
+            //document.addEventListener('keydown', setActive);
+
+            var keys = document.querySelectorAll(".key");
+            function setActive(e) {
+                for(var key = 0;key < keys.length;key++)
+                {
+                    if(e.key.toLowerCase() == keys[key].innerHTML.toLowerCase())
+                    {
+                        keys[key].className = "key active"
+                        break
+                    }
+                }
+            }
+
+            //document.addEventListener('keyup', removeAcitve);
+
+            var keys = document.querySelectorAll(".key");
+            function removeAcitve(e) {
+                for(var key = 0;key < keys.length;key++)
+                {
+                    if(e.key.toLowerCase() == keys[key].innerHTML.toLowerCase())
+                    {
+                        keys[key].className = "key"
+                        break
+                    }
+
+                }
+            }
+        </script>
+    </body>
+</html>
