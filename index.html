@@ -57,8 +57,6 @@
 
             socket.on('connect', () => {
                 socket.send('hi');
-
-                
             });
             socket.on("message", function(data) {
                 setTimeout(function(){socket.send('hi');},25)
@@ -72,7 +70,6 @@
             });
             socket.on("release", function(data) {
                 data = data.replace(/\'|\"/g,"")
-                console.log("relseasing: ",data);
                 if(lookupTable[data])
                 {
                     lookupTable[data].className = "key"
@@ -125,7 +122,6 @@
 
             function initKeyboardFromJSON(url)
             {
-                var getJSON = function(url) {
                     var xhr = new XMLHttpRequest();
                     xhr.open('GET', url, true);
                     xhr.responseType = 'json';
@@ -151,26 +147,13 @@
                                 keyboardElement.appendChild(rowElement);
                             }
 
-                        } else {
-                            console.log("something went wrong")
                         }
                     };
                     xhr.send();
-                };
-                getJSON(url)
             }
-            initKeyboardFromJSON("./keyboardFull.json")
-            console.log(lookupTable)
-            //this is the default layout. 
-            //if only a string is passed we will create the key on our own otherwise we will use the provided Key class
-            rows=[
-                ["`","1","2","3","4","5","6"],
-                ["TAB","Q","W","E","R","T","Y"],
-                ["CAPSLK","A","S","D","F","G","H"],
-                ["SHIFT","Z","X","C","V","B","N"],
-                ["CTRL","&#8862;","ALT","SPACE"]
-            ]
-            //initKeyboard(rows)
+            keyboardUrl = window.location.search.split("=")[1];
+            if (keyboardUrl == ""){keyboardUrl = "keyboard"}
+            initKeyboardFromJSON("./"+keyboardUrl+".json")
         </script>
     </body>
 </html>
