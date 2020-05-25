@@ -1,0 +1,61 @@
+/*This is the style for all keys, you can set background color and stuff here*/
+.key
+{
+    position: relative;
+    border: solid black 2px;
+    border-radius: 3px;
+    padding: 10px 15px;
+    margin: 4px 4px;
+    float: left;
+    text-align: center;
+    height: 20px;
+    min-width: 15px;
+    transform: skewX(-10deg) rotate(-.3deg)
+}
+.keySpacer
+{
+    opacity: 0;
+}
+/*When you press a key the active class will be added. Any style changes on key presses can go here*/
+.key.active
+{
+    
+}
+/*overlay goes by similar rules to the other keys. I really only added it to allow individual stylings to be added in the JSON*/
+.keyOverlay.inactive
+{
+    opacity: 0;
+    background-color: dodgerblue;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+/*the active class will also be added. But for some reason I chose to target the base class... must have had a reason*/
+.keyOverlay
+{
+    
+    opacity: .4;
+    background-color: dodgerblue;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+/*I dont think you want to touch the row class... but here it is in case you want to*/
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+/*You can set your custom fonts here in case you want something tacky*/
+body{
+    font-family: 'Roboto', sans-serif;
+}

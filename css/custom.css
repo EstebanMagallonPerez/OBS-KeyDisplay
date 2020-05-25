@@ -1,0 +1,29 @@
+/*this is an example of a more complex custom css
+in this case key numbers
+1,6,11 will be red, 
+2,7,12 will be orange
+3,8,13 will be yellow
+4,9,14 will be green
+5,10,15 will be blue
+
+and this pattern will be applied to each row*/
+.key:nth-child(5n-4)>.keyOverlay
+{
+    background-color: red;
+}
+.key:nth-child(5n-3)>.keyOverlay
+{
+    background-color: orange;
+}
+.key:nth-child(5n-2)>.keyOverlay
+{
+    background-color: yellow;
+}
+.key:nth-child(5n-1)>.keyOverlay
+{
+    background-color: green;
+}
+.key:nth-child(5n-0)>.keyOverlay
+{
+    background-color: blue;
+}

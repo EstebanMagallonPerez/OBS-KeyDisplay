@@ -1,12 +1,6 @@
 [
     [
        {
-          "displayText":"`",
-          "width":0,
-          "style":"",
-          "keyCode":41
-       },
-       {
           "displayText":"1",
           "width":0,
           "style":"",
@@ -46,7 +40,7 @@
     [
        {
           "displayText":"TAB",
-          "width":0,
+          "width":1,
           "style":"",
           "keyCode":15
        },
@@ -79,12 +73,6 @@
           "width":0,
           "style":"",
           "keyCode":20
-       },
-       {
-          "displayText":"Y",
-          "width":0,
-          "style":"",
-          "keyCode":21
        }
     ],
     [
@@ -123,18 +111,12 @@
           "width":0,
           "style":"",
           "keyCode":34
-       },
-       {
-          "displayText":"H",
-          "width":0,
-          "style":"",
-          "keyCode":35
        }
     ],
     [
        {
           "displayText":"SHIFT",
-          "width":4,
+          "width":3,
           "style":"",
           "keyCode":42
        },
@@ -167,12 +149,6 @@
           "width":0,
           "style":"",
           "keyCode":48
-       },
-       {
-          "displayText":"N",
-          "width":0,
-          "style":"",
-          "keyCode":49
        }
     ],
     [
@@ -181,12 +157,6 @@
           "width":0,
           "style":"",
           "keyCode":29
-       },
-       {
-          "displayText":"&#8862;",
-          "width":1,
-          "style":"",
-          "keyCode":91
        },
        {
           "displayText":"ALT",

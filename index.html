@@ -7,161 +7,17 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Key Display for OBS</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-        <style>
-            .keyboard
-            {
-                float: none;
-            }
-            .key
-            {
-                position: relative;
-                border: solid black 2px;
-                border-radius: 3px;
-                padding: 10px 15px;
-                margin: 4px 4px;
-                float: left;
-                text-align: center;
-                /*width: 20px;*/
-                height: 20px;
-                min-width: 15px;
-                transform: skewX(-10deg) rotate(-.3deg)
-            }
-            .key.active
-            {
-                color: white;
-            }
-            .keyOverlay.inactive
-            {
-                opacity: 0;
-                background-color: dodgerblue;
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: -1;
-            }
-            .keyOverlay
-            {
-                opacity: 1;
-                background-color: dodgerblue;
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: -1;
-            }
-            .standard
-            {
-                width: 20px;
-                height: 20px;
-            }
-            .row {
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                width: 100%;
-                padding: 0px;
-                margin: 0px;
-            }
-            body{
-                font-family: 'Roboto', sans-serif;
-            }
-        </style>
+        <link rel="stylesheet" href="css/default.css">
+        <link rel="stylesheet" href="css/custom.css">
     </head>
     <body>
         <div id="keyboard" class="keyboard">
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
-        <script>
-            const socket = io("http://localhost:8080");
-
-            socket.on('connect', () => {
-                socket.send('hi');
-            });
-            socket.on("message", function(data) {
-                setTimeout(function(){socket.send('hi');},25)
-            });
-
-            socket.on("press", function(data) {
-                if(lookupTable[""+data.scan_code])
-                {
-                    lookupTable[data.scan_code].className = "key active"
-                    lookupTable[data.scan_code].querySelector(".keyOverlay").className = "keyOverlay active"
-                }
-            });
-            socket.on("release", function(data) {
-                data = data.replace(/\'|\"/g,"")
-                if(lookupTable[data])
-                {
-                    lookupTable[data].className = "key"
-                    lookupTable[data].querySelector(".keyOverlay").className = "keyOverlay inactive"
-                }
-            });
-            function sendMsg() {
-                socket.emit("message", "HELLO WORLD");
-            }
-
-        </script>
-        <script>
-            //Define key class... this will be the key and any modification that we need
-            class Key
-            {
-                constructor(displayText, keyCode, width, style, overlayStyle) 
-                {
-                    this.displayText = displayText
-                    this.width = width;
-                    this.style = style;
-                    this.overlayStyle = overlayStyle;
-                    this.keyCode = keyCode;
-                }
-            }
-
-            outputJson = []
-            lookupTable = {}
-            function initKeyboardFromJSON(url)
-            {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.responseType = 'json';
-                    xhr.onload = function() {
-                        var status = xhr.status;
-                        if (status === 200) 
-                        {
-                            var keyboardElement = document.getElementById("keyboard");
-                            keyboard = xhr.response
-                            for(row = 0; row < keyboard.length; row++)
-                            {
-                                var rowElement = document.createElement("div");
-                                rowElement.className = "row";
-                                currentRow = keyboard[row]
-                                for (key = 0; key < currentRow.length; key++)
-                                {
-                                    currentKey = currentRow[key];
-                                    let keyElement = document.createElement("div");
-                                    keyElement.className = "key";
-                                    keyElement.innerHTML = "&nbsp;".repeat(currentKey.width)+currentKey.displayText.toUpperCase() +"&nbsp;".repeat(currentKey.width)
-                                    keyElement.setAttribute("style", currentKey.style);
-
-                                    let keyOverlay = document.createElement("div");
-                                    keyOverlay.className = "keyOverlay inactive";
-                                    keyOverlay.setAttribute("style", currentKey.overlayStyle);
-                                    keyElement.appendChild(keyOverlay)
-                                    lookupTable[currentKey.keyCode] = keyElement
-                                    rowElement.appendChild(keyElement)
-                                }
-                                keyboardElement.appendChild(rowElement);
-                            }
-
-                        }
-                    };
-                    xhr.send();
-            }
-            keyboardUrl = window.location.search.split("=")[1];
-            if (keyboardUrl == ""){keyboardUrl = "keyboard"}
-            initKeyboardFromJSON("./"+keyboardUrl+".json")
-        </script>
+        <script src="scripts/socket.js"></script>
+        <script src="scripts/key.js"></script>
+        <script src="scripts/keyboard.js"></script>
+        <script src="scripts/custom.js"></script>
     </body>
 </html>

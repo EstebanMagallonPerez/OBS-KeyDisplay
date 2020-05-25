@@ -57,8 +57,14 @@ def start():
 
 	app.router.add_get('/', index)
 	app.router.add_get('/generateKeyboard.html', index)
-	for file in os.listdir("./"):
+	for file in os.listdir("./keyboards"):
 		if file.endswith(".json"):
-			app.router.add_get('/'+file, index)
+			app.router.add_get('/keyboards/'+file, index)
+	for file in os.listdir("./css"):
+		if file.endswith(".css"):
+			app.router.add_get('/css/'+file, index)
+	for file in os.listdir("./scripts"):
+		if file.endswith(".js"):
+			app.router.add_get('/scripts/'+file, index)
 	web.run_app(app)
 start()
