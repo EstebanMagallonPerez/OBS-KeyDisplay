@@ -14,6 +14,7 @@
             }
             .key
             {
+                position: relative;
                 border: solid black 2px;
                 border-radius: 3px;
                 padding: 10px 15px;
@@ -25,9 +26,31 @@
                 min-width: 15px;
                 transform: skewX(-10deg) rotate(-.3deg)
             }
-            .active
+            .key.active
             {
-                background: rgba(0,0,0,.5);
+                color: white;
+            }
+            .keyOverlay.inactive
+            {
+                opacity: 0;
+                background-color: dodgerblue;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
+            }
+            .keyOverlay
+            {
+                opacity: 1;
+                background-color: dodgerblue;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
             }
             .standard
             {
@@ -66,6 +89,7 @@
                 if(lookupTable[""+data.scan_code])
                 {
                     lookupTable[data.scan_code].className = "key active"
+                    lookupTable[data.scan_code].querySelector(".keyOverlay").className = "keyOverlay active"
                 }
             });
             socket.on("release", function(data) {
@@ -73,6 +97,7 @@
                 if(lookupTable[data])
                 {
                     lookupTable[data].className = "key"
+                    lookupTable[data].querySelector(".keyOverlay").className = "keyOverlay inactive"
                 }
             });
             function sendMsg() {
@@ -84,42 +109,18 @@
             //Define key class... this will be the key and any modification that we need
             class Key
             {
-                constructor(displayText ,keyCode, width, style) {
+                constructor(displayText, keyCode, width, style, overlayStyle) 
+                {
                     this.displayText = displayText
                     this.width = width;
                     this.style = style;
+                    this.overlayStyle = overlayStyle;
                     this.keyCode = keyCode;
-                }
-
-                matches(testString) {
-                    if (this.textMatch != null)
-                    {
-                        return (testString == this.textMatch)
-                    }
-                    return testString == this.displayText
                 }
             }
 
             outputJson = []
             lookupTable = {}
-            function initKeyboard(layout)
-            {
-                var keyboard = document.getElementById("keyboard");
-                console.log(typeof layout);
-                for(var row = 0; row < layout.length;row++)
-                {
-                    currentRow = layout[row]
-                    outputJson[row] = []
-                    for(var key = 0; key < currentRow.length; key++)
-                    {
-                        contents = currentRow[key]
-                        outputJson[row][key] = new Key(contents,0,"","")
-                        contents = rows[row][key]
-                        //lookupTable[outputJson[row][key].keyCode] = keyElement
-                    }
-                }
-            }
-
             function initKeyboardFromJSON(url)
             {
                     var xhr = new XMLHttpRequest();
@@ -127,20 +128,27 @@
                     xhr.responseType = 'json';
                     xhr.onload = function() {
                         var status = xhr.status;
-                        if (status === 200) {
+                        if (status === 200) 
+                        {
                             var keyboardElement = document.getElementById("keyboard");
                             keyboard = xhr.response
-                            for(row = 0; row < keyboard.length;row++)
+                            for(row = 0; row < keyboard.length; row++)
                             {
                                 var rowElement = document.createElement("div");
                                 rowElement.className = "row";
                                 currentRow = keyboard[row]
-                                for (key = 0; key < currentRow.length;key++)
+                                for (key = 0; key < currentRow.length; key++)
                                 {
                                     currentKey = currentRow[key];
                                     let keyElement = document.createElement("div");
                                     keyElement.className = "key";
                                     keyElement.innerHTML = "&nbsp;".repeat(currentKey.width)+currentKey.displayText.toUpperCase() +"&nbsp;".repeat(currentKey.width)
+                                    keyElement.setAttribute("style", currentKey.style);
+
+                                    let keyOverlay = document.createElement("div");
+                                    keyOverlay.className = "keyOverlay inactive";
+                                    keyOverlay.setAttribute("style", currentKey.overlayStyle);
+                                    keyElement.appendChild(keyOverlay)
                                     lookupTable[currentKey.keyCode] = keyElement
                                     rowElement.appendChild(keyElement)
                                 }
