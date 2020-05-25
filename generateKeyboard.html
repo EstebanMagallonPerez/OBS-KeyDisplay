@@ -1,0 +1,146 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Key Display for OBS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+        <style>
+            .keyboard
+            {
+                float: none;
+            }
+            .key
+            {
+                border: solid black 2px;
+                border-radius: 3px;
+                padding: 10px 15px;
+                margin: 4px 4px;
+                float: left;
+                text-align: center;
+                /*width: 20px;*/
+                height: 20px;
+                min-width: 15px;
+                transform: skewX(-10deg) rotate(-.3deg)
+            }
+            .active
+            {
+                background: rgba(0,0,0,.5);
+            }
+            .standard
+            {
+                width: 20px;
+                height: 20px;
+            }
+            .row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                padding: 0px;
+                margin: 0px;
+                min-height: 15px;
+            }
+            body{
+                font-family: 'Roboto', sans-serif;
+            }
+            #keyboard
+            {
+                border: solid black 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <button onClick="addRow()">Add row</button>
+        <button onClick="exportJsontoTxt()">Export JSON</button>
+        <div>Add a row, then type the keys that you want in that row :)</div>
+        <div id="keyboard" class="keyboard">
+        </div>
+
+        <button onClick="copyToClipBoard()">Copy to ClipBoard</button>
+        <textarea style="width: 100%; height: 700px;" id="jsonOutput"></textarea>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+        <script>
+            class Key
+            {
+                constructor(displayText ,keyCode, width, style) {
+                    this.displayText = displayText
+                    this.width = width;
+                    this.style = style;
+                    this.keyCode = keyCode;
+                }
+
+                matches(testString) {
+                    if (this.textMatch != null)
+                    {
+                        return (testString == this.textMatch)
+                    }
+                    return testString == this.displayText
+                }
+            }
+
+
+            const socket = io("http://localhost:8080");
+
+            socket.on('connect', () => {
+                socket.send('hi');
+            });
+            socket.on("message", function(data) {
+                setTimeout(function(){socket.send('hi');},25)
+            });
+
+            exportJson = []
+            socket.on("press", function(data) {
+                if (currentRow == null)
+                {
+                    return
+                }
+                let keyElement = document.createElement("div");
+                keyElement.className = "key";
+                keyElement.innerHTML = data.value
+                currentRow.appendChild(keyElement)
+                currentRowLength = exportJson[exportJson.length-1].length
+                exportJson[exportJson.length-1][currentRowLength] = new Key(data.value,data.scan_code,0,"")
+                
+            });
+            function sendMsg() {
+                socket.emit("message", "HELLO WORLD");
+            }
+
+            var keyboardElement = document.getElementById("keyboard");
+            var currentRow = null
+            function addRow()
+            {
+                var rowElement = document.createElement("div");
+                rowElement.className = "row";
+                currentRow = rowElement
+                keyboardElement.appendChild(rowElement);
+                exportJson[exportJson.length] = []
+            }
+            function exportJsontoTxt()
+            {
+                document.getElementById("jsonOutput").innerHTML = JSON.stringify(exportJson, null, 4);
+                
+            }
+            function copyToClipBoard() 
+            {
+                /* Get the text field */
+                var copyText = document.getElementById("jsonOutput");
+
+                /* Select the text field */
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+                /* Copy the text inside the text field */
+                document.execCommand("copy");
+
+                /* Alert the copied text */
+                alert("Copied the text: " + copyText.value);
+            }
+        </script>
+        <script>
+        </script>
+    </body>
+</html>

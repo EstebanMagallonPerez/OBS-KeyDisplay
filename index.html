@@ -50,7 +50,6 @@
     <body>
         <div id="keyboard" class="keyboard">
         </div>
-        <button onClick="sendMsg()">Hit Me</button>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
         <script>
@@ -61,110 +60,117 @@
 
                 
             });
+            socket.on("message", function(data) {
+                setTimeout(function(){socket.send('hi');},25)
+            });
 
             socket.on("press", function(data) {
-                data = data.replace(/\'|\"/g,"")
-                //console.log("pressing",data);
-                
-                for(var key = 0;key < keys.length;key++)
+                if(lookupTable[""+data.scan_code])
                 {
-                    //console.log("in for loop")
-                    //console.log("checking if: ",data,"=",keys[key].innerHTML.toLowerCase())
-                    if(data.toLowerCase() == keys[key].innerHTML.toLowerCase())
-                    {
-                        keys[key].className = "key active"
-                        break
-                    }
+                    lookupTable[data.scan_code].className = "key active"
                 }
             });
             socket.on("release", function(data) {
                 data = data.replace(/\'|\"/g,"")
-                //console.log("relseasing: ",data);
-                
-                for(var key = 0;key < keys.length;key++)
+                console.log("relseasing: ",data);
+                if(lookupTable[data])
                 {
-                    //console.log("in for loop")
-                    //console.log("checking if: ",data,"=",keys[key].innerHTML.toLowerCase())
-                    if(data.toLowerCase() == keys[key].innerHTML.toLowerCase())
-                    {
-                        keys[key].className = "key"
-                        break
-                    }
+                    lookupTable[data].className = "key"
                 }
             });
-
-
             function sendMsg() {
                 socket.emit("message", "HELLO WORLD");
             }
 
         </script>
         <script>
-            class Modifier {
-                constructor(width, color, specialText) {
+            //Define key class... this will be the key and any modification that we need
+            class Key
+            {
+                constructor(displayText ,keyCode, width, style) {
+                    this.displayText = displayText
                     this.width = width;
-                    this.color = color;
-                    this.specialText = specialText;
+                    this.style = style;
+                    this.keyCode = keyCode;
+                }
+
+                matches(testString) {
+                    if (this.textMatch != null)
+                    {
+                        return (testString == this.textMatch)
+                    }
+                    return testString == this.displayText
                 }
             }
+
+            outputJson = []
+            lookupTable = {}
+            function initKeyboard(layout)
+            {
+                var keyboard = document.getElementById("keyboard");
+                console.log(typeof layout);
+                for(var row = 0; row < layout.length;row++)
+                {
+                    currentRow = layout[row]
+                    outputJson[row] = []
+                    for(var key = 0; key < currentRow.length; key++)
+                    {
+                        contents = currentRow[key]
+                        outputJson[row][key] = new Key(contents,0,"","")
+                        contents = rows[row][key]
+                        //lookupTable[outputJson[row][key].keyCode] = keyElement
+                    }
+                }
+            }
+
+            function initKeyboardFromJSON(url)
+            {
+                var getJSON = function(url) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'json';
+                    xhr.onload = function() {
+                        var status = xhr.status;
+                        if (status === 200) {
+                            var keyboardElement = document.getElementById("keyboard");
+                            keyboard = xhr.response
+                            for(row = 0; row < keyboard.length;row++)
+                            {
+                                var rowElement = document.createElement("div");
+                                rowElement.className = "row";
+                                currentRow = keyboard[row]
+                                for (key = 0; key < currentRow.length;key++)
+                                {
+                                    currentKey = currentRow[key];
+                                    let keyElement = document.createElement("div");
+                                    keyElement.className = "key";
+                                    keyElement.innerHTML = "&nbsp;".repeat(currentKey.width)+currentKey.displayText.toUpperCase() +"&nbsp;".repeat(currentKey.width)
+                                    lookupTable[currentKey.keyCode] = keyElement
+                                    rowElement.appendChild(keyElement)
+                                }
+                                keyboardElement.appendChild(rowElement);
+                            }
+
+                        } else {
+                            console.log("something went wrong")
+                        }
+                    };
+                    xhr.send();
+                };
+                getJSON(url)
+            }
+            initKeyboardFromJSON("./keyboardFull.json")
+            console.log(lookupTable)
+            //this is the default layout. 
+            //if only a string is passed we will create the key on our own otherwise we will use the provided Key class
             rows=[
                 ["`","1","2","3","4","5","6"],
                 ["TAB","Q","W","E","R","T","Y"],
                 ["CAPSLK","A","S","D","F","G","H"],
-                ["SHIFT","Z","X","C","V","B","N"]
+                ["SHIFT","Z","X","C","V","B","N"],
+                ["CTRL","&#8862;","ALT","SPACE"]
             ]
-            modifiers = 
-                {
-                "SHIFT":4
-            }
-            var keyboard = document.getElementById("keyboard");
-            console.log(keyboard);
-            for(var row = 0; row < rows.length;row++)
-            {
-                var currentRow = document.createElement("div");
-                currentRow.className = "row";
-                for(var key = 0; key < rows[row].length;key++)
-                {
-                    let currentKey = document.createElement("div");
-                    currentKey.className = "key";
-                    contents = rows[row][key]
-                    if (modifiers[contents])
-                    {
-                        contents = "&nbsp;".repeat(modifiers[contents])+contents+"&nbsp;".repeat(modifiers[contents])
-                    }
-                    currentKey.innerHTML = contents
-                    currentRow.appendChild(currentKey)
-                }
-                keyboard.appendChild(currentRow);
-            }
-            //document.addEventListener('keydown', setActive);
-
-            var keys = document.querySelectorAll(".key");
-            function setActive(e) {
-                for(var key = 0;key < keys.length;key++)
-                {
-                    if(e.key.toLowerCase() == keys[key].innerHTML.toLowerCase())
-                    {
-                        keys[key].className = "key active"
-                        break
-                    }
-                }
-            }
-
-            //document.addEventListener('keyup', removeAcitve);
-
-            var keys = document.querySelectorAll(".key");
-            function removeAcitve(e) {
-                for(var key = 0;key < keys.length;key++)
-                {
-                    if(e.key.toLowerCase() == keys[key].innerHTML.toLowerCase())
-                    {
-                        keys[key].className = "key"
-                        break
-                    }
-
-                }
-            }
+            //initKeyboard(rows)
         </script>
     </body>
 </html>
