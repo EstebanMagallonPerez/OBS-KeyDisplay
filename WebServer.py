@@ -4,10 +4,27 @@ import asyncio
 import keyboard
 import threading
 import os
+import pystray
+import sys
+from PIL import Image, ImageDraw
+from pystray import Icon as icon, Menu as menu, MenuItem as item
 
+
+closeThreads = False
 def start():
 	sio = socketio.AsyncServer()
 	recorded = []
+
+	def on_clicked(icon, item):
+		global closeThreads
+		closeThreads = True
+		icon.stop()
+
+	def makeIcon():
+		image = Image.open("key.png") #Battery Status Full
+		icon('KeyViewer', image,title="OBS KeyViewer", menu=menu(item('Exit',on_clicked))).run()
+		
+
 	def print_pressed_keys(e):
 		if e.event_type == "down":
 			if e.scan_code in recorded:
@@ -47,10 +64,9 @@ def start():
 
 	@sio.on('message')
 	async def received_message(sid, message):
+		if closeThreads:
+			sys.exit()
 		await sio.emit('message', message[::-1])
-
-	watcherThread = threading.Thread(target=keyboardWatcher)
-	watcherThread.start()
 
 	app = web.Application()
 	sio.attach(app)
@@ -66,5 +82,16 @@ def start():
 	for file in os.listdir("./scripts"):
 		if file.endswith(".js"):
 			app.router.add_get('/scripts/'+file, index)
+
+	watcherThread = threading.Thread(target=keyboardWatcher)
+	watcherThread.setDaemon(True)
+	watcherThread.start()
+
+	iconThread = threading.Thread(target=makeIcon)
+	iconThread.setDaemon(True)
+	iconThread.start()
+
 	web.run_app(app)
+	sys.exit()
+
 start()
