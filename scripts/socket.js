@@ -1,28 +1,40 @@
-/*
-    This is all the socket logic... I dont think you want to touch this, but if you do I would recommend only looking at the
-    on press and on release functions
-*/
-const socket = io("http://localhost:8080");
+document.addEventListener('DOMContentLoaded', function(){ 
+    if (!window.console) window.console = {};
+    if (!window.console.log) window.console.log = function() {};
+    updater.start();
+}, false);
 
-socket.on('connect', () => {
-    socket.send('hi');
-});
-socket.on("message", function(data) {
-    setTimeout(function(){socket.send('hi');},25)
-});
+var updater = {
+    socket: null,
 
-socket.on("press", function(data) {
+    start: function() {
+        var url = "ws://" + location.host + "/keyboardSocket";
+        updater.socket = new WebSocket(url);
+        updater.socket.onmessage = function(event) {
+            updater.showMessage(JSON.parse(event.data));
+        }
+    },
+
+    showMessage: function(message) {
+        if (message.type == "press"){
+            press(message)
+        }else if (message.type == "release"){
+            release(message)
+        } 
+    }
+};
+
+function press(data) {
     if(lookupTable[""+data.scan_code])
     {
         lookupTable[data.scan_code].className = "key active"
         lookupTable[data.scan_code].querySelector(".keyOverlay").className = "keyOverlay active"
     }
-});
-socket.on("release", function(data) {
-    data = data.replace(/\'|\"/g,"")
-    if(lookupTable[data])
+}
+function release(data) {
+    if(lookupTable[data.scan_code])
     {
-        lookupTable[data].className = "key"
-        lookupTable[data].querySelector(".keyOverlay").className = "keyOverlay inactive"
+        lookupTable[data.scan_code].className = "key"
+        lookupTable[data.scan_code].querySelector(".keyOverlay").className = "keyOverlay inactive"
     }
-});
+}
