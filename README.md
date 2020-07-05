@@ -9,11 +9,11 @@ I have 2 keyboards packaged
 
 which can be accessed by going to
 
-- http://localhost:8080/?keyboard=gamingKeyboard
-- http://localhost:8080/?keyboard=keyboard
+- http://localhost:8888/?keyboard=gamingKeyboard
+- http://localhost:8888/?keyboard=keyboard
 
 ## Generate Keybaord
-This tool is packaged with its own keyboard generator. Navagate to http://localhost:8080/generateKeyboard.html to generate your own layout.
+This tool is packaged with its own keyboard generator. Navagate to http://localhost:8888/generateKeyboard.html to generate your own layout.
 
 1. Click Add Row
 2. Press the keys in that row
@@ -21,7 +21,7 @@ This tool is packaged with its own keyboard generator. Navagate to http://localh
 4. Click export json
 5. Place json file in /keyboards/myKeyboard.json
 6. Restart the exe/python script
-7. Navagate to http://localhost:8080/?keyboard=myKeyboard
+7. Navagate to http://localhost:8888/?keyboard=myKeyboard
 
 ## Custom Style
 There is a custom.css file included in the folder with an example of some custom css, but really just add whatever you want here.
