@@ -2,7 +2,7 @@
 This is a browser based keypress tracer. It is fully customizable and allows for custom CSS to be applied on a per key basis with css through a json or with standard class addressing
 
 ## Selecting Keyboard
-To select your keyboard just navigate to http://localhost:8080/?keyboard=keyboardName
+To select your keyboard just navigate to http://localhost:8888/?keyboard=keyboardName
 I have 2 keyboards packaged 
 - gamingKeyboard.json
 - keyboard.json
